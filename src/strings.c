@@ -28,7 +28,7 @@ void freeString(String* s){
     free(s);
 }
 
-String* addStrChunk(String* s){
+StrChunk* addStrChunk(String* s){
     StrChunk* sc = (StrChunk*)malloc(sizeof(StrChunk));
     if (!sc)
     {

@@ -18,7 +18,7 @@ typedef struct String {
 
 String* newString();
 void freeString(String* s);
-String* addStrChunk(String* s);
+StrChunk* addStrChunk(String* s);
 void clearString(String* s);
 void appendString(String* dst, char* src, long len);
 

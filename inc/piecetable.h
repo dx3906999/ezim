@@ -1,16 +1,23 @@
 #ifndef PIECETABLE_H
 #define PIECETABLE_H
 
-#include "strings.h"
+#include <stdlib.h>
+#include <stdbool.h>
+#include "utils.h"
+
+#define INSERT_AFTER(p,add) {(add)->fd=(p);(add)->bk=(p)->bk;if((p)->bk){(p)->bk->fd=(add);}(p)->bk=(add);}
+#define PUSHBACK_DL(dlist,p) {if((dlist)->tail){INSERT_AFTER((dlist)->tail,p);(dlist)->tail=(p);}else{(dlist)->head=(dlist)->tail=(p);(p)->fd=(p)->bk=NULL;}}
+
+
+typedef Vector String;
 
 typedef struct Piece{
     struct Piece* fd;
     struct Piece* bk;
-    StrChunk* head_chunk;
-    StrChunk* tail_chunk;
-    int h_index;
-    int t_index;// included
-    long len;
+    long start;
+    long end;//included
+    bool is_add;
+    bool is_empty;
 }Piece;
 
 typedef struct PieceList{

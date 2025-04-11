@@ -38,3 +38,4 @@ void* getFromVector(Vector* vector,size_t index){
     
     return (char*)(vector->data)+index*(vector->type_size);
 }
+

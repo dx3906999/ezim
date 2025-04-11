@@ -1,14 +1,18 @@
 #ifndef LINEINDEX_H
 #define LINEINDEX_H
 #include "piecetable.h"
+#include "utils.h"
 
 typedef struct LineIndex
 {
-    Piece* head_piece;
+    Piece* piece;
     int offset;
 }LineIndex;
 
-typedef Vector LineIndexV;
+typedef struct LIManager{
+    Vector li_vector;
+    
+}LIManager;
 
 
 

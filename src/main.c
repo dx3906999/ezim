@@ -8,19 +8,21 @@
 
 int main(int argc, char const *argv[])
 {
-    // enableRawMode();
+    enableRawMode();
 
-    // printf("Raw mode ON (Press 'q' to quit)...\r\n");
+    printf("Raw mode ON (Press 'q' to quit)...\r\n");
 
-    // char c;
-    // while (1) {
-    //     read(STDIN_FILENO, &c, 1);  // 逐字符读取输入
-    //     if (c == 'q') break;
-    //     printf("You pressed: %d \r\n", c);  // 显示按下的键值
-    // }
-    Vector* v=newVector(sizeof(int));
-    GETV(v,int,0)=100;
-    printf("%d\n",GETV(v,int,0));
+    char c;
+    while (1) {
+        read(STDIN_FILENO, &c, 1);  // 逐字符读取输入
+        if (c == 'q') break;
+        printf("You pressed: %d \r\n", c);  // 显示按下的键值
+    }
+    // Vector* v=newVector(1,sizeof(int));
+    // GETV(v,int,0)=100;
+    // printf("%d\n",GETV(v,int,0));
+    // PUSHBACKV(v,int,12);
+    // printf("%d\n",GETV(v,int,1));
 
 
 

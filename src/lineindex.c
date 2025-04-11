@@ -4,7 +4,7 @@
 
 
 void test(){
-    LineIndexV liv=newVector(sizeof(LineIndex));
+    // LineIndexV liv=newVector(sizeof(LineIndex));
     
 }
 

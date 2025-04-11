@@ -29,6 +29,7 @@ void freePieceList(PieceList* pl){
     
 }
 
+//* need repiring
 //Only O(n)
 Piece* findPiece(PieceList* pl,long index, long* offset){
     index=index<pl->len?index:pl->len;
@@ -62,84 +63,72 @@ Piece* findPiece(PieceList* pl,long index, long* offset){
 }
 
 
-PieceTable* newPieceTable(FILE* fp){
+PieceTable* newPieceTable(FILE* fp, bool is_new){
     PieceTable* pt=(PieceTable*)malloc(sizeof(PieceTable));
-    if (!pt||!fp)
-    {
-        return NULL;
-    }
+
 
     pt->original=newString();
     pt->add=newString();
     pt->piece_list=newPieceList();
     Piece* p=(Piece*)malloc(sizeof(Piece));
-    Piece* final=(Piece*)malloc(sizeof(Piece));
+    // Piece* final=(Piece*)malloc(sizeof(Piece));
 
-    if (!pt->original||!pt->add||!pt->piece_list||!p||!final)
+    if (fp!=0)
     {
-        free(pt);// *! wrong!
-        return NULL;
-    }
-
-    size_t f_size=0;
-    fseek(fp,0,SEEK_END);
-    f_size=ftell(fp);
-    fseek(fp,0,SEEK_SET);
-    if (f_size>0)
-    {
-        char* buf=(char*)malloc(f_size);
-        if (!buf)
+        size_t f_size=0;
+        fseek(fp,0,SEEK_END);
+        f_size=ftell(fp);
+        fseek(fp,0,SEEK_SET);
+        if (f_size>0)
         {
-            free(pt->original);
-            free(pt->add);
-            free(pt->piece_list);
-            free(p);
-            free(pt);
-            return NULL;
+            char* buf=(char*)malloc(f_size);
+    
+            fread(buf,sizeof(char),f_size,fp);
+            appendString(pt->original,buf,f_size);
+            free(buf);
         }
-
-        fread(buf,sizeof(char),f_size,fp);
-        appendString(pt->original,buf,f_size);
-        free(buf);
     }
+    
     
     pt->piece_list->head=p;
     pt->piece_list->tail=p;
     pt->piece_list->len=pt->original->len;
     pt->piece_list->piece_num=2;
 
-    final->bk=NULL;
-    final->fd=p;
-    final->head_chunk=NULL;
-    final->tail_chunk=NULL;
-    final->h_index=-1;
-    final->t_index=-1;
-    final->len=-1;
+    // final->bk=NULL;
+    // final->fd=p;
+    // final->head_chunk=NULL;
+    // final->tail_chunk=NULL;
+    // final->h_index=-1;
+    // final->t_index=-1;
+    // final->len=-1;
 
-    p->bk=final;
+    p->bk=NULL;
     p->fd=NULL;
     p->head_chunk=pt->original->head;
     p->tail_chunk=pt->original->tail;
     p->h_index=0;
-    p->t_index=pt->original->tail->len-1;
+    p->t_index=(p->tail_chunk)?(pt->original->tail->len-1):0;
     p->len=pt->original->len;
     
     //* caution
-    pt->now_piece=final;
-    pt->now_index=0;
+    // pt->now_piece=final;
+    // pt->now_index=0;
 
     return pt;
 }
 
-bool isFinalPiece(Piece* p){
-    return (p->len==-1)?true:false;
-}
+// bool isFinalPiece(Piece* p){
+//     return (p->len==-1)?true:false;
+// }
 
 void freePieceTable(PieceTable* pt){
     freeString(pt->original);
     freeString(pt->add);
     freePieceList(pt->piece_list);
 }
+
+
 
 // problem
 Piece* cutPiece(Piece* p, long first_len){
@@ -182,48 +171,48 @@ Piece* cutPiece(Piece* p, long first_len){
 
 }
 
-Piece* insertPiece(PieceTable* pt){
-    Piece* p=(Piece*)malloc(sizeof(Piece));
-    if (!p)
-    {
-        return NULL;
-    }
-    p->len=0;
-    //* p's something
-    p->head_chunk=pt->add->tail;
-    p->tail_chunk=pt->add->tail;
-    p->h_index=pt->add->tail->len;
-    p->t_index=pt->add->tail->len;
+// Piece* insertPiece(PieceTable* pt){
+//     Piece* p=(Piece*)malloc(sizeof(Piece));
+//     if (!p)
+//     {
+//         return NULL;
+//     }
+//     p->len=0;
+//     //* p's something
+//     p->head_chunk=pt->add->tail;
+//     p->tail_chunk=pt->add->tail;
+//     p->h_index=pt->add->tail->len;
+//     p->t_index=pt->add->tail->len;
 
 
-    if (pt->now_index==0)
-    {
-        p->bk=pt->now_piece;
-        p->fd=pt->now_piece->fd;
+//     if (pt->now_index==0)
+//     {
+//         p->bk=pt->now_piece;
+//         p->fd=pt->now_piece->fd;
 
-        if (pt->now_piece->fd==NULL)
-        {
-            pt->piece_list->head=p;
-        }
-        else
-        {
-            pt->now_piece->fd->bk=p;
-        }
+//         if (pt->now_piece->fd==NULL)
+//         {
+//             pt->piece_list->head=p;
+//         }
+//         else
+//         {
+//             pt->now_piece->fd->bk=p;
+//         }
 
-        pt->now_piece->fd=p;
+//         pt->now_piece->fd=p;
         
-    }
-    else
-    {
-        Piece* second_piece=cutPiece(pt->now_piece,pt->now_index+1);
-        pt->now_piece->bk=p;
-        second_piece->fd=p;
-        p->fd=pt->now_piece;
-        p->bk=second_piece;
-        pt->now_piece=p;
-        pt->now_index=0;
-    }
+//     }
+//     else
+//     {
+//         Piece* second_piece=cutPiece(pt->now_piece,pt->now_index+1);
+//         pt->now_piece->bk=p;
+//         second_piece->fd=p;
+//         p->fd=pt->now_piece;
+//         p->bk=second_piece;
+//         pt->now_piece=p;
+//         pt->now_index=0;
+//     }
     
     
     
-}
+// }

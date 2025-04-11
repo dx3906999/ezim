@@ -53,30 +53,19 @@ StrChunk* addStrChunk(String* s){
     return sc;
 }
 
-void clearString(String* s){
-    StrChunk* sc=s->head;
-    while (sc)
-    {
-        sc->len=0;
-        sc=sc->bk;
-    }
-    s->len=0;
-    
-}
-
 void appendString(String* dst, char* src, long len){
     if (dst->chunk_num==0)
     {
         addStrChunk(dst);
     }
 
-    while (dst->tail->len+len>CHUNKSIZE-1)
+    while (dst->tail->len+len>CHUNKSIZE)
     {
-        memcpy(dst->tail->str+dst->tail->len,src,CHUNKSIZE-dst->tail->len-1);
-        len-=CHUNKSIZE-dst->tail->len-1;
-        src+=CHUNKSIZE-dst->tail->len-1;
-        dst->len+=CHUNKSIZE-dst->tail->len-1;
-        dst->tail->len=CHUNKSIZE-1;
+        memcpy(dst->tail->str+dst->tail->len,src,CHUNKSIZE-dst->tail->len);
+        len-=CHUNKSIZE-dst->tail->len;
+        src+=CHUNKSIZE-dst->tail->len;
+        dst->len+=CHUNKSIZE-dst->tail->len;
+        dst->tail->len=CHUNKSIZE;
         addStrChunk(dst);
     }
     

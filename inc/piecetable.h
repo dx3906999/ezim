@@ -23,9 +23,7 @@ typedef struct PieceList{
 typedef struct PieceTable{
     String* original;
     String* add;
-    PieceList* piece_list;// with a final piece
-    Piece* now_piece;// in the piece_list
-    long now_index;
+    PieceList* piece_list;
 }PieceTable;
 
 

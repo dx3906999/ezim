@@ -22,6 +22,26 @@ Vector* newVector(size_t len,size_t type_size){
     
 }
 
+Vector* newVectorCapa(size_t len,size_t type_size,size_t capacity){
+    Vector* vector=(Vector*)malloc(sizeof(Vector));
+    if (!vector)
+    {
+        return NULL;
+    }
+    vector->len=len;
+    vector->capacity=capacity;
+    vector->type_size=type_size;
+    vector->data=calloc(vector->capacity,type_size);
+    if (!vector->data)
+    {
+        free(vector);
+        return NULL;
+    }
+    
+    return vector;
+    
+}
+
 
 void freeVector(Vector* vector){
     free(vector->data);

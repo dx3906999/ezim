@@ -31,8 +31,8 @@ Editor* newEditor(FILE* fp);
 void freeEditor(Editor* editor);
 void updateEditorMode(volatile int* current_mode, char input_c);
 void findNextChar(PosInPiece* pos, long ver, int direction, PieceList* pl);
-void findNextLine(PosInPiece* pos, long ver, int direction, PieceList* pl);
-void inNormalModeBackend(char input_c, Editor* editor);
+void findNextLine(PosInPiece* pos, long ver, int direction, PieceTable* pt);
+void inNormalMode(char input_c, Editor* editor);
 void inInsertModeBackend(char input_c, Editor* editor);
 void inCommamdMode(char input_c, Editor* editor, struct winsize* size);
 

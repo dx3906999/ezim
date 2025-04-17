@@ -10,6 +10,10 @@
 
 struct winsize wd_size;
 struct termios orig_termios;
+int now_linenum;
+Vector* linelen_vector;
+long linecode_start;
+bool last_print_is_full;
 
 void disableRawMode() {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
@@ -135,13 +139,14 @@ void printNextNLines(Piece* startPiece, PieceTable* pt, long start_index, long n
 }
 
 
-void printNextNLinesWithLineCode(Piece* startPiece, PieceTable* pt, long start_index, long start_linecode, long nlines, struct winsize* size, FILE* fp, long ver){
+void printNextNLinesWithLineCode(Piece* startPiece, PieceTable* pt, long start_index_in_piece, long start_linecode, long nlines, struct winsize* size, FILE* fp, long ver){
     Piece* p=startPiece;
     char ch=0;
     long line_count=0;
     String* buffer=NULL;
-    long index=start_index;
+    long index=start_index_in_piece;
     long linecode=start_linecode;
+    resizeVector(linelen_vector,nlines);
     for (int i = 0; i < nlines && p; i++,linecode++)
     {
         fprintf(fp,"\x1b[2m%4d \x1b[0m",linecode);
@@ -150,7 +155,7 @@ void printNextNLinesWithLineCode(Piece* startPiece, PieceTable* pt, long start_i
             buffer=(p->is_add)?pt->add:pt->original;
             if (p->is_inline)
             {
-                for (size_t j = index; j <= p->end; j++)
+                for (size_t j = index+p->start; j <= p->end; j++)
                 {
                     ch=GETV(buffer,char,j);
                     if (line_count%(size->ws_col-5)==0&&line_count!=0)
@@ -159,6 +164,7 @@ void printNextNLinesWithLineCode(Piece* startPiece, PieceTable* pt, long start_i
                     }
                     putc(ch,fp);
                     line_count++;
+                    GETV(linelen_vector,int,i)+=1;
                 }
 
                 p=findNextPiece(p,ver);
@@ -167,13 +173,14 @@ void printNextNLinesWithLineCode(Piece* startPiece, PieceTable* pt, long start_i
             }
             else
             {
-                for (size_t j = index; j <= p->end; j++)
+                for (size_t j = index+p->start; j <= p->end; j++)
                 {
                     ch=GETV(buffer,char,j);
-                    
-                    line_count=(ch=='\n')?0:(line_count+1);
+                    GETV(linelen_vector,int,i)=line_count;
+                    // line_count=(ch=='\n')?0:(line_count+1);
                     if (ch=='\n')
                     {
+                        line_count=0;
                         if (i!=nlines-1)
                         {
                             putc(ch,fp);
@@ -199,6 +206,7 @@ void printNextNLinesWithLineCode(Piece* startPiece, PieceTable* pt, long start_i
                     }
                     else
                     {
+                        line_count++;
                         putc(ch,fp);
                         if (line_count%(size->ws_col-5)==0&&line_count!=0)
                         {
@@ -222,9 +230,10 @@ void printNextNLinesWithLineCode(Piece* startPiece, PieceTable* pt, long start_i
         }
 
         i+=line_count/(size->ws_col-5);
-
+        last_print_is_full=(i==nlines-1);
     }
     
+    now_linenum=linecode+1-start_linecode;
 }
 
 void printMode(volatile int mode,struct winsize* size){
@@ -245,4 +254,39 @@ void printMode(volatile int mode,struct winsize* size){
         break;
     }
     printf("\x1b[u");
+}
+
+void printLog(char* log, struct winsize* size){
+    printf("\x1b[s");
+    printf("\x1b[%d;%dH",size->ws_row,1);
+    printf("%s",log);
+    printf("\x1b[u");
+}
+
+void getCursorPosition(int *rows, int *cols) {
+    char buf[32];
+    unsigned int i = 0;
+
+    write(STDOUT_FILENO, "\x1b[6n", 4);
+
+    while (i < sizeof(buf) - 1) {
+        if (read(STDIN_FILENO, &buf[i], 1) != 1) break;
+        if (buf[i] == 'R') break;
+        i++;
+    }
+
+    buf[i] = '\0';
+
+    if (buf[0] != '\x1b' || buf[1] != '[') return;
+    sscanf(&buf[2], "%d;%d", rows, cols);
+}
+
+void rollLine(int diretion){
+
+}
+
+
+
+void changeCursorChar(int direction){
+
 }

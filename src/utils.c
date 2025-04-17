@@ -59,3 +59,15 @@ void* getFromVector(Vector* vector,size_t index){
     return (char*)(vector->data)+index*(vector->type_size);
 }
 
+void resizeVector(Vector* vector,size_t len){
+    if (len>vector->capacity)
+    {
+        vector->data=realloc(vector->data,(vector->type_size)*len);
+        vector->capacity=vector->len=len;
+    }
+    else
+    {
+        vector->len=len;
+    }
+
+}

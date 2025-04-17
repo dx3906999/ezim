@@ -161,6 +161,12 @@ Piece* cutPiece(Piece* p, long first_len, PieceTable* piecetable){
     {
         new_p->is_inline=true;
     }
+
+    if (piecetable->piece_list->tail==p)
+    {
+        piecetable->piece_list->tail=new_p;
+    }
+    
     
 
     return new_p;
@@ -255,6 +261,12 @@ Piece* insertPiece(Piece* p,PieceTable* piecetable, long ver){
         pe_temp=pe_temp->next_edge;
     }
     pe_temp->next_edge=pe1;
+
+    if (pe2->next==NULL)
+    {
+        piecetable->piece_list->tail=p_new;
+    }
+    
 
 }
 

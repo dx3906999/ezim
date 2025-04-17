@@ -2,7 +2,7 @@
 #include "editor.h"
 #include "terminal.h"
 #include "piecetable.h"
-
+#include "main.h"
 // int editor_mode=0;
 // PosInPiece pos_in_piece={0};
 // PieceTable* global_piecetable=NULL;
@@ -112,15 +112,121 @@ void findNextChar(PosInPiece* pos, long ver, int direction, PieceList* pl){
     
 }
 
-void findNextLine(PosInPiece* pos, long ver, int direction, PieceList* pl){
-    Piece* temp_piece;
+void findNextLine(PosInPiece* pos, long ver, int direction, PieceTable* pt){
+    Piece* temp_piece=pos->piece;
+    Vector* bufferlinebreak=(pos->piece->is_add)?pt->add_linebreak:pt->original_linebreak;
     if (direction>=0)
+    {
+        if (pos->piece->is_inline||(!pos->piece->is_inline&&(GETV(bufferlinebreak,long,pos->piece->line_break_end)<(pos->piece->start+pos->index_in_piece))))
+        {
+            
+            while (findNextPiece(temp_piece,ver))
+            {
+                temp_piece=findNextPiece(temp_piece,ver);
+                if (!temp_piece->is_inline)
+                {
+                    break;
+                }    
+            }
+
+            if (!temp_piece->is_inline)
+            {
+                bufferlinebreak=(temp_piece->is_add)?(pt->add_linebreak):(pt->original_linebreak);
+                if (GETV(bufferlinebreak,long,temp_piece->line_break_start)!=temp_piece->end)
+                {
+                    pos->piece=temp_piece;
+                    pos->index_in_piece=GETV(bufferlinebreak,long,temp_piece->line_break_start)+1-temp_piece->start;
+                }
+                else
+                {
+                    temp_piece=findNextPiece(temp_piece,ver);
+                    if (temp_piece&&!temp_piece->is_empty)
+                    {
+                        pos->piece=temp_piece;
+                        pos->index_in_piece=0;
+                    }
+                    //否则已经是最后一行
+                }
+            }
+            //否则已经是最后一行
+            
+        }
+        else
+        {
+            for (size_t i = pos->piece->line_break_start; i <= pos->piece->line_break_end; i++)
+            {
+                if (GETV(bufferlinebreak,long,i)>pos->piece->start+pos->index_in_piece)
+                {
+                    if (GETV(bufferlinebreak,long,i)!=pos->piece->end)
+                    {
+                        pos->index_in_piece=GETV(bufferlinebreak,long,i)-pos->piece->start+1;
+                    }
+                    else
+                    {
+                        temp_piece=findNextPiece(pos->piece,ver);
+                        if (temp_piece&&!temp_piece->is_empty)
+                        {
+                            pos->piece=findNextPiece(pos->piece,ver);
+                            pos->index_in_piece=0;
+                        }
+                        //否则已经是最后一行
+                        
+                    }
+                    
+                    break;
+                }
+                
+            }
+            
+        }
+        
+        
+    }
+    else
+    {
+        //TODO
+        if (pos->piece->is_inline||(!pos->piece->is_inline&&(GETV(bufferlinebreak,long,pos->piece->line_break_start)>=(pos->piece->start+pos->index_in_piece))))
+        {
+            
+        }
+        else
+        {
+            for (size_t i = pos->piece->line_break_start; i <= pos->piece->line_break_end; i++)
+            {
+                if (GETV(bufferlinebreak,long,i)>=pos->piece->start+pos->index_in_piece)
+                {
+                    pos->index_in_piece=GETV(bufferlinebreak,long,i-1)-pos->piece->start+1;
+                    break;
+                }
+
+                if (i==pos->piece->line_break_end&&GETV(bufferlinebreak,long,i)<pos->piece->start+pos->index_in_piece)
+                {
+                    pos->index_in_piece=
+                }
+                
+                
+            }
+
+        }
+        
+        
+    }
+    
+}
+
+void insertChar(char input_c,PosInPiece* pos,PieceTable* pt){
+    PUSHBACKV(pt->add,char,input_c);
+    if (pos->piece->end==pos->piece->start+pos->index_in_piece)
     {
         
     }
+    
 }
 
-void inNormalModeBackend(char input_c, Editor* editor){
+void inNormalMode(char input_c, Editor* editor){
+    PosInPiece temp_pos=*editor->pos_in_piece;
+    int temp_row;
+    int temp_col;
     switch (input_c)
     {
     case 'h':
@@ -129,13 +235,41 @@ void inNormalModeBackend(char input_c, Editor* editor){
     case 'l':
         findNextChar(editor->pos_in_piece,editor->now_ver,1,editor->piecetable->piece_list);
         break;
+    case 'j':
+        getCursorPosition(&temp_row,&temp_col);
+        if (last_print_is_full)
+        {
+            findNextLine(editor->pos_in_piece,editor->now_ver,1,editor->piecetable);
+            linecode_start++;
+            system("clear");
+            printf(RTS);
+            printNextNLinesWithLineCode(
+                editor->pos_in_piece->piece,
+                editor->piecetable,
+                editor->pos_in_piece->index_in_piece,
+                linecode_start,
+                wd_size.ws_row-1,
+                &wd_size,
+                stdout,
+                editor->now_ver
+            );
+            printMode(editor->editor_mode,&wd_size);
+        }
+        printf("\x1b[%d;%dH", temp_row, temp_col);
+        break;
+    case 'k':
+        break;
     default:
         break;
     }
 }
 
 void inInsertModeBackend(char input_c, Editor* editor){
-
+    if (input_c>=32&&input_c<=126)
+    {
+        
+    }
+    
 }
 
 void inCommamdMode(char input_c, Editor* editor, struct winsize* size){
@@ -160,6 +294,10 @@ void inCommamdMode(char input_c, Editor* editor, struct winsize* size){
         case 'w':
             state|=COMMAND_SAVE;
             break;
+        case 27:
+            goto inCommamdMode_end;
+        case 127:
+            printf("\x1b[1D \x1b[1D");
         default:
             break;
         }
@@ -184,7 +322,7 @@ void inCommamdMode(char input_c, Editor* editor, struct winsize* size){
     // {
     //     printf(" ");
     // }
-    
+    inCommamdMode_end:
     printf("\x1b[u");
 }
 

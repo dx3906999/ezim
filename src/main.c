@@ -59,12 +59,18 @@ int main(int argc, char const *argv[])
     printf(RTS);
     Editor* editor=newEditor(fp);
     editor->filename=(argc>1)?argv[1]:"tempbuffer";
+
+    //* 循环数组
+    linelen_vector=newVectorCapa(wd_size.ws_row,sizeof(int),wd_size.ws_row);
+    linecode_start=1;
+    last_print_is_full=false;
+
     // printPieces(editor->piecetable,stdout,editor->now_ver);
     printNextNLinesWithLineCode(
         editor->pos_in_piece->piece,
         editor->piecetable,
         editor->pos_in_piece->index_in_piece,
-        1,
+        linecode_start,
         wd_size.ws_row-1,
         &wd_size,
         stdout,
@@ -74,7 +80,9 @@ int main(int argc, char const *argv[])
 
     // debug
     printf(RTS);
-    printf("ok.\n\r");
+    printf("\x1b[5C");
+    // printf("ok.\n\r");
+    printLog("ok.",&wd_size);
 
     while (1)
     {
@@ -90,7 +98,7 @@ int main(int argc, char const *argv[])
         switch (editor->editor_mode)
         {
         case M_NORMAL:
-            inNormalModeBackend(ch,editor);
+            inNormalMode(ch,editor);
             break;
         case M_COMMAND:
             inCommamdMode(ch,editor,&wd_size);

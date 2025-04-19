@@ -528,44 +528,41 @@ void inInsertModeBackend(char input_c, Editor* editor){
         // printf("\x1b[%d;%dH", temp_row, temp_col+1);//todo where is the cursor
         // inNormalMode('l',editor);
         // printMode(editor->editor_mode,&wd_size);
-        if (!(editor->pos_in_piece->piece==editor->piecetable->piece_list->tail_piece&&editor->pos_in_piece->index_in_piece+editor->pos_in_piece->piece->start==editor->pos_in_piece->piece->end))
+        if ((temp_col+1)<=6+GETV(linelen_vector,int,temp_row-1)&&!(temp_col==wd_size.ws_col))
         {
-            if ((temp_col+1)<=6+GETV(linelen_vector,int,temp_row-1)&&!(temp_col==wd_size.ws_col))
-            {
-                printf("\x1b[%d;%dH", temp_row, temp_col+1);
-                // findNextChar(editor->pos_in_piece,editor->now_ver,1,editor->piecetable->piece_list);
-            }
-            else if (temp_row+1<=wd_size.ws_row-1)
-            {
-                printf("\x1b[%d;%dH", temp_row+1, 6);
-                // findNextChar(editor->pos_in_piece,editor->now_ver,1,editor->piecetable->piece_list);
-            }
-            else if (temp_row+1>wd_size.ws_row-1)
-            {
-                if (last_print_is_full)
-                {
-                    // findNextChar(editor->pos_in_piece,editor->now_ver,1,editor->piecetable->piece_list);
-                    findNextLine(&page_start_pos,editor->now_ver,1,editor->piecetable);
-                    linecode_start++;
-                    // system("clear");
-                    printf(CLS);
-                    printf(RTS);
-                    printNextNLinesWithLineCode(
-                        page_start_pos.piece,
-                        editor->piecetable,
-                        page_start_pos.index_in_piece,
-                        linecode_start,
-                        wd_size.ws_row-1,
-                        &wd_size,
-                        stdout,
-                        editor->now_ver
-                    );
-                    printMode(editor->editor_mode,&wd_size);
-                    printf("\x1b[%d;%dH",temp_row,6);
-                }
-            }
-            
+            printf("\x1b[%d;%dH", temp_row, temp_col+1);
+            // findNextChar(editor->pos_in_piece,editor->now_ver,1,editor->piecetable->piece_list);
         }
+        else if (temp_row+1<=wd_size.ws_row-1)
+        {
+            printf("\x1b[%d;%dH", temp_row+1, 6);
+            // findNextChar(editor->pos_in_piece,editor->now_ver,1,editor->piecetable->piece_list);
+        }
+        else if (temp_row+1>wd_size.ws_row-1)
+        {
+            if (last_print_is_full)
+            {
+                // findNextChar(editor->pos_in_piece,editor->now_ver,1,editor->piecetable->piece_list);
+                findNextLine(&page_start_pos,editor->now_ver,1,editor->piecetable);
+                linecode_start++;
+                // system("clear");
+                printf(CLS);
+                printf(RTS);
+                printNextNLinesWithLineCode(
+                    page_start_pos.piece,
+                    editor->piecetable,
+                    page_start_pos.index_in_piece,
+                    linecode_start,
+                    wd_size.ws_row-1,
+                    &wd_size,
+                    stdout,
+                    editor->now_ver
+                );
+                printMode(editor->editor_mode,&wd_size);
+                printf("\x1b[%d;%dH",temp_row,6);
+            }
+        }
+            
     }
     else if (input_c==127)
     {
@@ -639,6 +636,8 @@ void insertChar(PosInPiece* pos, char input_c, PieceTable* pt,long ver,Vector* u
     if (pos->piece->is_empty)//*problem
     {
         temp_p=insertAfterPiece(pos->piece,pt,ver);
+        pos->piece=findNextPiece(temp_p,ver);
+        pos->index_in_piece=0;
         PUSHBACKV(undo_ver,long,pt->ver_counter);
         temp_p->is_empty=false;
         PUSHBACKV(pt->add,char,input_c);

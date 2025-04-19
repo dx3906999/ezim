@@ -73,20 +73,20 @@ PieceTable* newPieceTable(FILE* fp){
 
     piecetable->original=newVector(f_size,sizeof(char));
 
-    Piece* p=(Piece*)malloc(sizeof(Piece));
+    // Piece* p=(Piece*)malloc(sizeof(Piece));
     Piece* tail=(Piece*)malloc(sizeof(Piece));
-    p->bk_edges=NULL;
-    p->fd_edges=NULL;
+    // p->bk_edges=NULL;
+    // p->fd_edges=NULL;
     tail->bk_edges=NULL;
     tail->fd_edges=NULL;
-    tail->index_in_all_nodes=1;
-    p->index_in_all_nodes=0;
+    tail->index_in_all_nodes=0;
+    // p->index_in_all_nodes=0;
     // piecetable->piece_list->head=piecetable->piece_list->tail=p;
-    piecetable->piece_list->head_edges=newPieceEdge(NULL,p,0);
-    newPieceEdge(p,tail,0);
+    // piecetable->piece_list->head_edges=newPieceEdge(NULL,p,0);
+    // newPieceEdge(p,tail,0);
     piecetable->piece_list->tail_piece=tail;
     PUSHBACKV(piecetable->piece_list->all_nodes,bool,true);
-    PUSHBACKV(piecetable->piece_list->all_nodes,bool,true);
+    // PUSHBACKV(piecetable->piece_list->all_nodes,bool,true);
 
     tail->is_add=false;
     tail->is_empty=false;
@@ -104,27 +104,33 @@ PieceTable* newPieceTable(FILE* fp){
             }
             
         }
-
+        Piece* p=(Piece*)malloc(sizeof(Piece));
         p->is_inline=(piecetable->original_linebreak->len==0)?true:false;
-        
         p->is_add=false;
         p->start=0;
         p->end=f_size-1;
         p->is_empty=false;
         p->line_break_start=0;
         p->line_break_end=piecetable->original_linebreak->len-1;
+        p->index_in_all_nodes=1;
+        p->bk_edges=p->fd_edges=NULL;
+        PUSHBACKV(piecetable->piece_list->all_nodes,bool,true);
+
+        piecetable->piece_list->head_edges=newPieceEdge(NULL,p,0);
+        newPieceEdge(p,tail,0);
 
         PUSHBACKV(piecetable->original,char,' ');
         tail->end=tail->start=piecetable->original->len-1;
     }
     else
     {
-        p->is_add=true;
-        p->start=0;
-        p->end=0;
-        p->is_empty=true;
-        p->line_break_start=0;
-        p->line_break_end=0;
+        // p->is_add=true;
+        // p->start=0;
+        // p->end=0;
+        // p->is_empty=true;
+        // p->line_break_start=0;
+        // p->line_break_end=0;
+        piecetable->piece_list->head_edges=newPieceEdge(NULL,tail,0);
 
         PUSHBACKV(piecetable->original,char,' ');
         tail->end=tail->start=piecetable->original->len-1;

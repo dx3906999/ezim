@@ -64,8 +64,10 @@ int main(int argc, char const *argv[])
     linelen_vector=newVectorCapa(wd_size.ws_row,sizeof(int),wd_size.ws_row);
     linecode_start=1;
     last_print_is_full=false;
+    page_start_pos=*editor->pos_in_piece;
 
     // printPieces(editor->piecetable,stdout,editor->now_ver);
+    
     printNextNLinesWithLineCode(
         editor->pos_in_piece->piece,
         editor->piecetable,
@@ -75,6 +77,7 @@ int main(int argc, char const *argv[])
         &wd_size,
         stdout,
         editor->now_ver
+        // 12
     );
     printMode(editor->editor_mode,&wd_size);
 
@@ -90,10 +93,6 @@ int main(int argc, char const *argv[])
         char ch=getchar();
         updateEditorMode(&editor->editor_mode,ch);
         printMode(editor->editor_mode,&wd_size);
-        if (editor->editor_mode!=editor_mode_temp)
-        {
-            
-        }
 
         switch (editor->editor_mode)
         {
@@ -104,6 +103,13 @@ int main(int argc, char const *argv[])
             inCommamdMode(ch,editor,&wd_size);
             editor->editor_mode=M_NORMAL;
             printMode(M_NORMAL,&wd_size);
+            break;
+        case M_INSERT:
+            if (editor_mode_temp==editor->editor_mode)
+            {
+                inInsertModeBackend(ch,editor);
+            }
+            
             break;
         default:
             break;

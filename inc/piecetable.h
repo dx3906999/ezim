@@ -13,13 +13,16 @@ typedef Vector String;
 
 typedef struct PieceEdge{
     long ver;
-    struct PieceEdge* next_edge;
+    struct PieceEdge* fdp_next_edge;
+    struct PieceEdge* bkp_next_edge;
     struct Piece* next;
+    struct Piece* prev;
     long next_index_in_all_nodes;
 }PieceEdge;
 
 typedef struct Piece{
-    PieceEdge* edges;
+    PieceEdge* bk_edges;
+    PieceEdge* fd_edges;
     long start;
     long end;//included
     int line_break_start;
@@ -31,8 +34,8 @@ typedef struct Piece{
 }Piece;
 
 typedef struct PieceList{
-    Piece* head;
-    Piece* tail;
+    PieceEdge* head_edges;
+    Piece* tail_piece;
     Vector* all_nodes;// to free the PieceList
 }PieceList;
 
@@ -47,14 +50,20 @@ typedef struct PieceTable{
 }PieceTable;
 
 PieceList* newPieceList();
-void freePieceList(Vector* all_nodes,Piece* p);
+void freePieceListR(Vector* all_nodes,Piece* p);
+void freePieceList(PieceList* pl);
 PieceTable* newPieceTable(FILE* fp);
+PieceEdge* newPieceEdge(Piece* fdp,Piece* bkp,long ver);
 void freePieceTable(PieceTable* pt);
 Piece* cutPiece(Piece* p, long first_len, PieceTable* piecetable);
 Piece* findNextPiece(Piece* p, long ver);
+Piece* findPrevPiece(Piece* p,long ver);
 void deletePiece(Piece* fd, PieceTable* piecetable, long ver);
-Piece* insertPiece(Piece* p,PieceTable* piecetable, long ver);
+// Piece* insertPiece(Piece* p,PieceTable* piecetable, long ver);
+Piece* insertAfterPiece(Piece* p,PieceTable* piecetable, long ver);
+Piece* insertBeforePiece(Piece* p,PieceTable* piecetable,long ver);
 void printPieces(PieceTable* piecetable, FILE* fp, long ver);
-
+Piece* findNextPieceByPE(PieceEdge* pe, long ver);
+Piece* findPrevPieceByPE(PieceEdge* pe,long ver);
 
 #endif

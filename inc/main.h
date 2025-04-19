@@ -8,5 +8,6 @@ extern int now_linenum;
 extern Vector* linelen_vector;
 extern long linecode_start;
 extern bool last_print_is_full;
+extern PosInPiece page_start_pos;
 
 #endif

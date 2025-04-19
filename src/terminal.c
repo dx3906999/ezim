@@ -14,6 +14,7 @@ int now_linenum;
 Vector* linelen_vector;
 long linecode_start;
 bool last_print_is_full;
+PosInPiece page_start_pos;
 
 void disableRawMode() {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
@@ -146,12 +147,19 @@ void printNextNLinesWithLineCode(Piece* startPiece, PieceTable* pt, long start_i
     String* buffer=NULL;
     long index=start_index_in_piece;
     long linecode=start_linecode;
+    int linelen_index=0;
     resizeVector(linelen_vector,nlines);
-    for (int i = 0; i < nlines && p; i++,linecode++)
+    for (size_t i = 0; i < nlines; i++)
     {
-        fprintf(fp,"\x1b[2m%4d \x1b[0m",linecode);
+        GETV(linelen_vector,int,i)=0;
+    }
+    fprintf(fp,"\x1b[2m%4d \x1b[0m",linecode);
+    for (int i = 0; i < nlines && p; i++)
+    {
+        
         if (!p->is_empty)
         {
+            // fprintf(fp,"\x1b[2m%4d \x1b[0m",linecode);
             buffer=(p->is_add)?pt->add:pt->original;
             if (p->is_inline)
             {
@@ -161,10 +169,11 @@ void printNextNLinesWithLineCode(Piece* startPiece, PieceTable* pt, long start_i
                     if (line_count%(size->ws_col-5)==0&&line_count!=0)
                     {
                         fprintf(fp,"     ");
+                        linelen_index++;
                     }
                     putc(ch,fp);
                     line_count++;
-                    GETV(linelen_vector,int,i)+=1;
+                    GETV(linelen_vector,int,linelen_index)+=1;
                 }
 
                 p=findNextPiece(p,ver);
@@ -176,11 +185,14 @@ void printNextNLinesWithLineCode(Piece* startPiece, PieceTable* pt, long start_i
                 for (size_t j = index+p->start; j <= p->end; j++)
                 {
                     ch=GETV(buffer,char,j);
-                    GETV(linelen_vector,int,i)=line_count;
+                    // GETV(linelen_vector,int,i+line_count/(size->ws_col-5))=line_count%(size->ws_col-5);
                     // line_count=(ch=='\n')?0:(line_count+1);
                     if (ch=='\n')
                     {
+                        // GETV(linelen_vector,int,linelen_index)+=1;
                         line_count=0;
+                        linecode++;
+                        linelen_index++;
                         if (i!=nlines-1)
                         {
                             putc(ch,fp);
@@ -189,7 +201,10 @@ void printNextNLinesWithLineCode(Piece* startPiece, PieceTable* pt, long start_i
                         if (fp==stdout&&i!=nlines-1)
                         {
                             putc('\r',fp);
+                            fprintf(fp,"\x1b[2m%4d \x1b[0m",linecode);
                         }
+                        
+                        
                         // index=j+1;
 
                         if (j==p->end)
@@ -199,19 +214,22 @@ void printNextNLinesWithLineCode(Piece* startPiece, PieceTable* pt, long start_i
                         }
                         else
                         {
-                            index=j+1;
+                            index=j+1-p->start;
                         }
                         
                         break;
                     }
                     else
                     {
-                        line_count++;
-                        putc(ch,fp);
+
                         if (line_count%(size->ws_col-5)==0&&line_count!=0)
                         {
                             fprintf(fp,"     ");
+                            linelen_index++;
                         }
+                        line_count++;
+                        GETV(linelen_vector,int,linelen_index)+=1;
+                        putc(ch,fp);
                     }
                     
 
@@ -220,6 +238,7 @@ void printNextNLinesWithLineCode(Piece* startPiece, PieceTable* pt, long start_i
                         index=0;
                         p=findNextPiece(p,ver);
                         i--;
+                        // linelen_index--;
                         break;
                     }
                     
@@ -228,6 +247,16 @@ void printNextNLinesWithLineCode(Piece* startPiece, PieceTable* pt, long start_i
             }
             
         }
+        else
+        {
+            do
+            {
+                p=findNextPiece(p,ver);
+            } while (p!=NULL&&p->is_empty);
+            i--;
+            index==0;
+        }
+        
 
         i+=line_count/(size->ws_col-5);
         last_print_is_full=(i==nlines-1);
@@ -258,6 +287,13 @@ void printMode(volatile int mode,struct winsize* size){
 
 void printLog(char* log, struct winsize* size){
     printf("\x1b[s");
+    // printf("\x1b[%d;%dH",size->ws_row,1);
+    //clear line
+    printf("\x1b[%d;%dH",size->ws_row,1);
+    for (size_t i = 0; i < size->ws_col-8; i++)
+    {
+        printf(" ");
+    }
     printf("\x1b[%d;%dH",size->ws_row,1);
     printf("%s",log);
     printf("\x1b[u");

@@ -23,6 +23,8 @@ typedef struct Editor{
     FILE* fp;
     const char* filename;
     long now_ver;
+    Vector* history_ver;
+    Vector* redo_ver;
 }Editor;
 
 
@@ -35,6 +37,6 @@ void findNextLine(PosInPiece* pos, long ver, int direction, PieceTable* pt);
 void inNormalMode(char input_c, Editor* editor);
 void inInsertModeBackend(char input_c, Editor* editor);
 void inCommamdMode(char input_c, Editor* editor, struct winsize* size);
-
+void insertChar(PosInPiece* pos, char input_c, PieceTable* pt,long ver,Vector* undo_ver);
 
 #endif

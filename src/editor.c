@@ -492,6 +492,55 @@ void inNormalMode(char input_c, Editor* editor){
         }
         printf("\x1b[%d;%dH", temp_row, temp_col);
         break;
+    case 26:
+        if (editor->now_ver>0)
+        {
+            editor->now_ver--;
+        }
+        page_start_pos.piece=findNextPieceByPE(editor->piecetable->piece_list->head_edges,editor->now_ver);
+        page_start_pos.index_in_piece=0;
+        *editor->pos_in_piece=page_start_pos;
+        linecode_start=1;
+        printf(CLS);
+        printf(RTS);
+        printNextNLinesWithLineCode(
+            page_start_pos.piece,
+            editor->piecetable,
+            page_start_pos.index_in_piece,
+            linecode_start,
+            wd_size.ws_row-1,
+            &wd_size,
+            stdout,
+            editor->now_ver
+        );
+        printMode(editor->editor_mode,&wd_size);
+        printf("\x1b[%d;%dH", 1,6);
+        break;
+    case 25:
+        if (editor->now_ver<GETV(editor->history_ver,long,editor->history_ver->len-1))
+        {
+            editor->now_ver++;
+        }
+        page_start_pos.piece=findNextPieceByPE(editor->piecetable->piece_list->head_edges,editor->now_ver);
+        page_start_pos.index_in_piece=0;
+        linecode_start=1;
+        *editor->pos_in_piece=page_start_pos;
+        printf(CLS);
+        printf(RTS);
+        printNextNLinesWithLineCode(
+            page_start_pos.piece,
+            editor->piecetable,
+            page_start_pos.index_in_piece,
+            linecode_start,
+            wd_size.ws_row-1,
+            &wd_size,
+            stdout,
+            editor->now_ver
+        );
+        printMode(editor->editor_mode,&wd_size);
+        printf("\x1b[%d;%dH", 1,6);
+        break;
+        
     default:
         break;
     }

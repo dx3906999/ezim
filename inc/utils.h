@@ -7,6 +7,7 @@
 
 #define GETV(vector,type,index) (*((type*)getFromVector((vector),(index))))
 #define PUSHBACKV(vector,type,data) {GETV(vector,type,(vector)->len)=(type)(data);(vector)->len++;}
+#define POPV(vector) {if ((vector)->len>0){(vector)->len--;}}
 
 typedef struct Vector{
     void* data;

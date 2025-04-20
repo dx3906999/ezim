@@ -447,50 +447,50 @@ void inNormalMode(char input_c, Editor* editor){
         printLog((ch[0]!='\n')?ch:"Enter",&wd_size);
         break;
     case 'j':// todo
-        getCursorPosition(&temp_row,&temp_col);
-        if (last_print_is_full)
-        {
-            findNextLine(editor->pos_in_piece,editor->now_ver,1,editor->piecetable);
-            linecode_start++;
-            // system("clear");
-            printf(CLS);
-            printf(RTS);
-            printNextNLinesWithLineCode(
-                editor->pos_in_piece->piece,
-                editor->piecetable,
-                editor->pos_in_piece->index_in_piece,
-                linecode_start,
-                wd_size.ws_row-1,
-                &wd_size,
-                stdout,
-                editor->now_ver
-            );
-            printMode(editor->editor_mode,&wd_size);
-        }
-        printf("\x1b[%d;%dH", temp_row, temp_col);
+        // getCursorPosition(&temp_row,&temp_col);
+        // if (last_print_is_full)
+        // {
+        //     findNextLine(editor->pos_in_piece,editor->now_ver,1,editor->piecetable);
+        //     linecode_start++;
+        //     // system("clear");
+        //     printf(CLS);
+        //     printf(RTS);
+        //     printNextNLinesWithLineCode(
+        //         editor->pos_in_piece->piece,
+        //         editor->piecetable,
+        //         editor->pos_in_piece->index_in_piece,
+        //         linecode_start,
+        //         wd_size.ws_row-1,
+        //         &wd_size,
+        //         stdout,
+        //         editor->now_ver
+        //     );
+        //     printMode(editor->editor_mode,&wd_size);
+        // }
+        // printf("\x1b[%d;%dH", temp_row, 6);
         break;
     case 'k'://todo
-        getCursorPosition(&temp_row,&temp_col);
-        if (linecode_start>1)
-        {
-            findNextLine(editor->pos_in_piece,editor->now_ver,-1,editor->piecetable);
-            linecode_start--;
-            // system("clear");
-            printf(CLS);
-            printf(RTS);
-            printNextNLinesWithLineCode(
-                editor->pos_in_piece->piece,
-                editor->piecetable,
-                editor->pos_in_piece->index_in_piece,
-                linecode_start,
-                wd_size.ws_row-1,
-                &wd_size,
-                stdout,
-                editor->now_ver
-            );
-            printMode(editor->editor_mode,&wd_size);
-        }
-        printf("\x1b[%d;%dH", temp_row, temp_col);
+        // getCursorPosition(&temp_row,&temp_col);
+        // if (linecode_start>1)
+        // {
+        //     findNextLine(editor->pos_in_piece,editor->now_ver,-1,editor->piecetable);
+        //     linecode_start--;
+        //     // system("clear");
+        //     printf(CLS);
+        //     printf(RTS);
+        //     printNextNLinesWithLineCode(
+        //         editor->pos_in_piece->piece,
+        //         editor->piecetable,
+        //         editor->pos_in_piece->index_in_piece,
+        //         linecode_start,
+        //         wd_size.ws_row-1,
+        //         &wd_size,
+        //         stdout,
+        //         editor->now_ver
+        //     );
+        //     printMode(editor->editor_mode,&wd_size);
+        // }
+        // printf("\x1b[%d;%dH", temp_row, 6);
         break;
     case 26:
         if (editor->now_ver>0)

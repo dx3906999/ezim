@@ -429,21 +429,6 @@ Piece* findPrevPieceByPE(PieceEdge* pe,long ver){
 
 //* have problem
 void deletePiece(Piece* p, PieceTable* piecetable, long ver){
-    // piecetable->ver_counter++;
-    // Piece* p=findNextPiece(fd,ver);// fd != NULL
-    // PieceEdge* pe=(PieceEdge*)malloc(sizeof(PieceEdge));
-    // PieceEdge* pe_f=fd->edges;
-    // pe->ver=piecetable->ver_counter;
-    // pe->next=findNextPiece(p,ver);
-    // pe->next_index_in_all_nodes=(pe->next)?(pe->next->index_in_all_nodes):(-1);
-    // pe->next_edge=NULL;
-
-    // while (pe_f->next_edge)
-    // {
-    //     pe_f=pe_f->next_edge;
-    // }
-
-    // pe_f->next_edge=pe;
     piecetable->ver_counter++;
     Piece* fdp=findPrevPiece(p,ver);
     Piece* bkp=findNextPiece(p,ver);
@@ -462,12 +447,6 @@ void deletePiece(Piece* p, PieceTable* piecetable, long ver){
 
     if (!bkp)
     {
-        // temp_pe=piecetable->piece_list->tail_edges;
-        // while (temp_pe->bkp_next_edge)
-        // {
-        //     temp_pe=temp_pe->bkp_next_edge;
-        // }
-        // temp_pe->bkp_next_edge=pe;
         piecetable->piece_list->tail_piece=p;
         
     }

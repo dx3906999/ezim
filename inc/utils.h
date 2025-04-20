@@ -10,13 +10,13 @@
 
 typedef struct Vector{
     void* data;
-    size_t len;
+    long len;
     size_t type_size;
     size_t capacity;
 }Vector;
 
-Vector* newVector(size_t len,size_t type_size);
-Vector* newVectorCapa(size_t len,size_t type_size,size_t capacity);
+Vector* newVector(long len,size_t type_size);
+Vector* newVectorCapa(long len,size_t type_size,size_t capacity);
 void freeVector(Vector* vector);
 void* getFromVector(Vector* vector,size_t index);
 void resizeVector(Vector* vector,size_t len);

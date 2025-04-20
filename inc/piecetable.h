@@ -58,7 +58,7 @@ void freePieceTable(PieceTable* pt);
 Piece* cutPiece(Piece* p, long first_len, PieceTable* piecetable);
 Piece* findNextPiece(Piece* p, long ver);
 Piece* findPrevPiece(Piece* p,long ver);
-void deletePiece(Piece* fd, PieceTable* piecetable, long ver);
+void deletePiece(Piece* p, PieceTable* piecetable, long ver);
 // Piece* insertPiece(Piece* p,PieceTable* piecetable, long ver);
 Piece* insertAfterPiece(Piece* p,PieceTable* piecetable, long ver);
 Piece* insertBeforePiece(Piece* p,PieceTable* piecetable,long ver);

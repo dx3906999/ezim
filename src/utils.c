@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include "utils.h"
 
-Vector* newVector(size_t len,size_t type_size){
+Vector* newVector(long len,size_t type_size){
     Vector* vector=(Vector*)malloc(sizeof(Vector));
     if (!vector)
     {
@@ -22,7 +22,7 @@ Vector* newVector(size_t len,size_t type_size){
     
 }
 
-Vector* newVectorCapa(size_t len,size_t type_size,size_t capacity){
+Vector* newVectorCapa(long len,size_t type_size,size_t capacity){
     Vector* vector=(Vector*)malloc(sizeof(Vector));
     if (!vector)
     {

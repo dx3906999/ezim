@@ -551,6 +551,11 @@ void printPieces(PieceTable* piecetable, FILE* fp, long ver){
         }
 
         p=findNextPiece(p,ver);
+        if (p==piecetable->piece_list->tail_piece)
+        {
+            break;
+        }
+        
         
     }
     
